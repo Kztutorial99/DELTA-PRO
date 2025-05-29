@@ -59,67 +59,21 @@
                             <i class="fas fa-file-alt me-1"></i>System Logs
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <div class="nav-link" style="cursor: pointer;" onclick="showContactSupport()">
+                            <i class="fas fa-headset me-1"></i>Contact Support
+                        </div>
+                    </li>
                 </ul>
                 
                 <div class="navbar-nav align-items-center">
-                    <!-- System Status and Profile Container -->
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="d-flex flex-column align-items-end">
-                            <span class="navbar-text small mb-0">
-                                <i class="fas fa-circle text-success me-1"></i>
-                                System Online
-                            </span>
-                            <small class="text-muted" style="font-size: 0.75rem;">DELTA PRO Active</small>
-                        </div>
-                        
-                        <!-- Profile Button with DELTA PRO Style -->
-                        <div class="profile-container">
-                            <button class="profile-btn" id="profileBtn" title="Info Pembuat" aria-label="Profil Pembuat">
-                                <svg width="100%" height="100%" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-                                    <circle cx="24" cy="24" r="24" fill="#222"/>
-                                    <circle cx="24" cy="19" r="9" fill="#00ff99" fill-opacity="0.85"/>
-                                    <ellipse cx="24" cy="36" rx="13" ry="7" fill="#00ff99" fill-opacity="0.25"/>
-                                    <circle cx="24" cy="19" r="7" fill="#fff" fill-opacity="0.85"/>
-                                    <ellipse cx="24" cy="36" rx="10" ry="5" fill="#fff" fill-opacity="0.25"/>
-                                </svg>
-                            </button>
-                            <div class="profile-menu" id="profileMenu" role="menu" aria-hidden="true">
-                                <h3>DELTA PRO</h3>
-                                <p>Panel by XanRoom</p>
-                                <div class="links">
-                                    <a href="https://t.me/XanRoom" target="_blank" rel="noopener" role="menuitem">
-                                        <span class="icon" aria-hidden="true">
-                                            <svg width="20" height="20" viewBox="0 0 50 50" fill="none">
-                                                <circle cx="25" cy="25" r="25" fill="#229ED9"/>
-                                                <path d="M37 15L13 24.5L21.5 27.5L34 18.5L23.5 28.5L23.5 35L27.5 30.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
-                                        </span>
-                                        Telegram
-                                    </a>
-                                    <a href="https://youtube.com/@Kz.tutorial" target="_blank" rel="noopener" role="menuitem">
-                                        <span class="icon" aria-hidden="true">
-                                            <svg width="20" height="20" viewBox="0 0 50 50" fill="none">
-                                                <circle cx="25" cy="25" r="25" fill="#FF0000"/>
-                                                <polygon points="20,17 36,25 20,33" fill="#fff"/>
-                                            </svg>
-                                        </span>
-                                        Youtube
-                                    </a>
-                                    <a href="#" role="menuitem" onclick="refreshPage()">
-                                        <span class="icon" aria-hidden="true">
-                                            <i class="fas fa-sync-alt" style="color: #00ff99;"></i>
-                                        </span>
-                                        Refresh
-                                    </a>
-                                    <a href="#" role="menuitem" onclick="showSettings()">
-                                        <span class="icon" aria-hidden="true">
-                                            <i class="fas fa-cog" style="color: #00ff99;"></i>
-                                        </span>
-                                        Settings
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- System Status -->
+                    <div class="d-flex flex-column align-items-end">
+                        <span class="navbar-text small mb-0">
+                            <i class="fas fa-circle text-success me-1"></i>
+                            System Online
+                        </span>
+                        <small class="text-muted" style="font-size: 0.75rem;">DELTA PRO Active</small>
                     </div>
                 </div>
             </div>
@@ -160,6 +114,59 @@
     
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/monitoring.js') }}"></script>
+    
+    <script>
+        // Contact Support function
+        function showContactSupport() {
+            const contactModal = document.createElement('div');
+            contactModal.className = 'modal fade';
+            contactModal.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content" style="background: linear-gradient(145deg, rgba(15, 35, 25, 0.95), rgba(25, 45, 35, 0.95)); border: 1px solid rgba(0, 255, 153, 0.2);">
+                        <div class="modal-header border-0">
+                            <h5 class="modal-title text-white">
+                                <i class="fas fa-headset text-success me-2"></i>
+                                Contact Support
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="text-center mb-4">
+                                <h3 class="text-success">DELTA PRO</h3>
+                                <p class="text-muted">Panel by XanRoom</p>
+                            </div>
+                            <div class="d-grid gap-3">
+                                <a href="https://t.me/XanRoom" target="_blank" class="btn btn-outline-primary">
+                                    <i class="fab fa-telegram me-2"></i>
+                                    Telegram Support
+                                </a>
+                                <a href="https://youtube.com/@Kz.tutorial" target="_blank" class="btn btn-outline-danger">
+                                    <i class="fab fa-youtube me-2"></i>
+                                    YouTube Channel
+                                </a>
+                                <button class="btn btn-outline-success" onclick="refreshPage()">
+                                    <i class="fas fa-sync-alt me-2"></i>
+                                    Refresh Page
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(contactModal);
+            const modal = new bootstrap.Modal(contactModal);
+            modal.show();
+            
+            contactModal.addEventListener('hidden.bs.modal', () => {
+                document.body.removeChild(contactModal);
+            });
+        }
+
+        function refreshPage() {
+            location.reload();
+        }
+    </script>
     
     {% block extra_scripts %}{% endblock %}
 </body>
