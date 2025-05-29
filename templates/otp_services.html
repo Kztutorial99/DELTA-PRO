@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block title %}Layanan OTP - DELTA PRO{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-3">
+                <i class="fas fa-mobile-alt text-primary me-2"></i>
+                Layanan OTP
+            </h1>
+            <p class="text-muted">Pilih layanan OTP dan kelola nomor telepon dengan mudah</p>
+        </div>
+    </div>
+
+    <!-- OTP Services Grid -->
+    <div class="row mb-4">
+        {% if services %}
+            {% for service in services %}
+            <div class="col-xl-4 col-md-6 mb-3">
+                <div class="card service-card border-0 shadow-sm h-100" data-service="{{ service.name }}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="service-info">
+                                <h5 class="card-title mb-2">
+                                    <i class="fas fa-mobile-alt text-success me-2"></i>
+                                    {{ service.name }}
+                                </h5>
+                                <p class="text-muted mb-2">
+                                    <small>Prefix: {{ service.prefix }}</small>
+                                </p>
+                                <div class="service-status">
+                                    {% if service.status == 'active' %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>Aktif
+                                        </span>
+                                    {% elif service.status == 'maintenance' %}
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-wrench me-1"></i>Maintenance
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-times me-1"></i>Tidak Aktif
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="service-actions">
+                                {% if service.status == 'active' %}
+                                    <button class="btn btn-primary btn-sm select-service-btn" 
+                                            data-service="{{ service.name }}" 
+                                            data-prefix="{{ service.prefix }}">
+                                        <i class="fas fa-hand-pointer me-1"></i>Pilih
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-secondary btn-sm" disabled>
+                                        <i class="fas fa-ban me-1"></i>Tidak Tersedia
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-mobile-alt text-muted fa-3x mb-3"></i>
+                    <h4 class="text-muted">Tidak ada layanan OTP tersedia</h4>
+                    <p class="text-muted">Silakan hubungi administrator untuk informasi lebih lanjut</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- OTP Form -->
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-phone text-success me-2"></i>
+                        Kirim OTP
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="otpForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="selectedService" class="form-label">Layanan Terpilih</label>
+                                <input type="text" class="form-control" id="selectedService" 
+                                       placeholder="Pilih layanan di atas" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phoneNumber" class="form-label">Nomor Telepon</label>
+                                <div class="input-group">
+                                    <span class="input-group-text" id="phonePrefix">+62</span>
+                                    <input type="tel" class="form-control" id="phoneNumber" 
+                                           placeholder="8123456789" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-success" id="sendOtpBtn" disabled>
+                                    <i class="fas fa-paper-plane me-2"></i>
+                                    Kirim OTP
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary ms-2" onclick="clearForm()">
+                                    <i class="fas fa-times me-2"></i>
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <!-- Loading State -->
+                    <div id="otpLoading" class="text-center py-3" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Mengirim permintaan OTP...</p>
+                    </div>
+                    
+                    <!-- Response Area -->
+                    <div id="otpResponse" class="mt-3" style="display: none;">
+                        <div class="alert" role="alert" id="responseAlert">
+                            <pre id="responseContent" class="mb-0"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Statistics -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-pie text-info me-2"></i>
+                        Statistik Layanan
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-item">
+                                <h3 class="text-success">{{ services | selectattr('status', 'equalto', 'active') | list | length }}</h3>
+                                <p class="text-muted mb-0">Layanan Aktif</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-item">
+                                <h3 class="text-warning">{{ services | selectattr('status', 'equalto', 'maintenance') | list | length }}</h3>
+                                <p class="text-muted mb-0">Maintenance</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-item">
+                                <h3 class="text-primary">{{ services | length }}</h3>
+                                <p class="text-muted mb-0">Total Layanan</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-item">
+                                <h3 class="text-info">24/7</h3>
+                                <p class="text-muted mb-0">Dukungan</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let selectedService = null;
+    let selectedPrefix = null;
+
+    // Service selection
+    document.querySelectorAll('.select-service-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remove previous selection
+            document.querySelectorAll('.service-card').forEach(card => {
+                card.classList.remove('selected-service');
+            });
+            
+            // Add selection to current card
+            this.closest('.service-card').classList.add('selected-service');
+            
+            // Update form
+            selectedService = this.dataset.service;
+            selectedPrefix = this.dataset.prefix;
+            
+            document.getElementById('selectedService').value = selectedService;
+            document.getElementById('phonePrefix').textContent = selectedPrefix;
+            
+            // Enable form
+            updateFormState();
+            
+            // Show notification
+            if (monitoringSystem) {
+                monitoringSystem.showNotification(`Layanan ${selectedService} dipilih`, 'success');
+            }
+        });
+    });
+
+    // Phone number input
+    document.getElementById('phoneNumber').addEventListener('input', updateFormState);
+
+    // Form submission
+    document.getElementById('otpForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        sendOtp();
+    });
+
+    function updateFormState() {
+        const phoneNumber = document.getElementById('phoneNumber').value.trim();
+        const sendBtn = document.getElementById('sendOtpBtn');
+        
+        if (selectedService && phoneNumber) {
+            sendBtn.disabled = false;
+        } else {
+            sendBtn.disabled = true;
+        }
+    }
+
+    function sendOtp() {
+        const phoneNumber = document.getElementById('phoneNumber').value.trim();
+        const loading = document.getElementById('otpLoading');
+        const response = document.getElementById('otpResponse');
+        const responseAlert = document.getElementById('responseAlert');
+        const responseContent = document.getElementById('responseContent');
+        
+        // Show loading
+        loading.style.display = 'block';
+        response.style.display = 'none';
+        
+        // Simulate API call (in real implementation, this would call your OTP API)
+        setTimeout(() => {
+            loading.style.display = 'none';
+            response.style.display = 'block';
+            
+            // Mock response for demo
+            const mockResponse = {
+                status: 'success',
+                service: selectedService,
+                phone: selectedPrefix + phoneNumber,
+                message: 'OTP berhasil dikirim',
+                timestamp: new Date().toLocaleString()
+            };
+            
+            responseAlert.className = 'alert alert-success';
+            responseContent.textContent = JSON.stringify(mockResponse, null, 2);
+            
+            if (monitoringSystem) {
+                monitoringSystem.showNotification('OTP berhasil dikirim!', 'success');
+            }
+        }, 2000);
+    }
+});
+
+function clearForm() {
+    // Reset form
+    document.getElementById('selectedService').value = '';
+    document.getElementById('phoneNumber').value = '';
+    document.getElementById('phonePrefix').textContent = '+62';
+    document.getElementById('sendOtpBtn').disabled = true;
+    
+    // Remove service selection
+    document.querySelectorAll('.service-card').forEach(card => {
+        card.classList.remove('selected-service');
+    });
+    
+    // Hide response
+    document.getElementById('otpResponse').style.display = 'none';
+    
+    selectedService = null;
+    selectedPrefix = null;
+    
+    if (monitoringSystem) {
+        monitoringSystem.showNotification('Form direset', 'info');
+    }
+}
+</script>
+
+<style>
+.service-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.service-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+}
+
+.service-card.selected-service {
+    border: 2px solid #00ff99 !important;
+    box-shadow: 0 0 15px rgba(0,255,153,0.3) !important;
+}
+
+.stat-item h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+#responseContent {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background: transparent;
+    border: none;
+    color: inherit;
+}
+</style>
+{% endblock %}

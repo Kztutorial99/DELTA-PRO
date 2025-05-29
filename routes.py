@@ -36,6 +36,27 @@ def metrics():
                              metrics={},
                              error="Unable to load metrics data")
 
+@app.route('/otp-services')
+def otp_services():
+    """OTP Services page"""
+    try:
+        # Define OTP services like in DELTA PRO
+        services = [
+            {"name": "Tokopedia", "prefix": "62", "status": "active"},
+            {"name": "LionParcel", "prefix": "+62", "status": "active"},
+            {"name": "KlikDokter", "prefix": "62", "status": "active"},
+            {"name": "Alodokter", "prefix": "62", "status": "active"},
+            {"name": "Shopee", "prefix": "62", "status": "maintenance"},
+            {"name": "Bukalapak", "prefix": "62", "status": "active"}
+        ]
+        
+        return render_template('otp_services.html', services=services)
+    except Exception as e:
+        logging.error(f"Error loading OTP services: {e}")
+        return render_template('otp_services.html', 
+                             services=[],
+                             error="Unable to load OTP services")
+
 @app.route('/logs')
 def logs():
     """System logs viewer"""

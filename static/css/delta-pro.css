@@ -271,8 +271,11 @@ body {
 }
 
 /* Profile Button and Menu from DELTA PRO */
-.profile-btn {
+.profile-container {
     position: relative;
+}
+
+.profile-btn {
     width: 38px;
     height: 38px;
     border-radius: 50%;
