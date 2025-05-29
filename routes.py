@@ -126,8 +126,12 @@ def acknowledge_alert(alert_id):
 
 @app.route('/api/send-otp', methods=['POST'])
 def send_otp():
-    """Send OTP to phone number"""
+    """Send OTP to phone number using real OTP services"""
     try:
+        import requests
+        import json
+        import uuid
+        
         data = request.get_json()
         service = data.get('service')
         phone = data.get('phone')
@@ -141,25 +145,141 @@ def send_otp():
         # Log request
         logging.info(f"OTP request - Service: {service}, Phone: {phone}")
         
-        # Since this is a real OTP service, we need actual API credentials
-        # For now, return a proper response structure
-        response = {
-            'status': 'success',
-            'message': f'Permintaan OTP untuk {service} telah diterima',
-            'service': service,
-            'phone': phone,
-            'request_id': f"REQ_{int(time.time())}",
-            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'note': 'Untuk mengaktifkan pengiriman OTP yang sesungguhnya, diperlukan API key dari provider OTP'
+        # OTP Services configuration
+        OTP_SERVICES = {
+            "Tokopedia": {
+                "url": "https://gql.tokopedia.com/graphql/OTPRequest",
+                "headers": {
+                    'User-Agent': "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.7103.61 Mobile Safari/537.36",
+                    'Content-Type': "application/json",
+                    'x-source': "tokopedia-lite",
+                    'origin': "https://www.tokopedia.com",
+                    'referer': "https://www.tokopedia.com/register",
+                },
+                "payload": json.dumps([{
+                    "operationName": "OTPRequest",
+                    "variables": {
+                        "msisdn": phone,
+                        "otpType": "116",
+                        "mode": "whatsapp",
+                        "otpDigit": 6
+                    },
+                    "query": """
+                    query OTPRequest($otpType: String!, $mode: String, $msisdn: String, $otpDigit: Int) {
+                      OTPRequest: OTPRequestV2(otpType: $otpType, mode: $mode, msisdn: $msisdn, otpDigit: $otpDigit) {
+                        success
+                        message
+                        errorMessage
+                      }
+                    }
+                    """
+                }])
+            },
+            "LionParcel": {
+                "url": "https://algo-api.lionparcel.com/v2/account/auth/otp/request",
+                "headers": {
+                    'User-Agent': "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36",
+                    'Accept': "application/json, text/plain, */*",
+                    'Content-Type': "application/json",
+                    'origin': "https://lionparcel.com",
+                    'referer': "https://lionparcel.com/register",
+                    'accept-language': "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
+                },
+                "payload": json.dumps({
+                    "phone_number": phone,
+                    "role": "CUSTOMER",
+                    "otp_type": "REGISTER",
+                    "messaging_type": "WHATSAPP"
+                })
+            },
+            "KlikDokter": {
+                "url": "https://user-api.medkomtek.com/user-svc/api/v1/users/check",
+                "headers": {
+                    'User-Agent': "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36",
+                    'Accept': "application/json",
+                    'Content-Type': "application/json",
+                    'x-api-platform': "eyJhcHBfdmVyc2lvbiI6IjIuMC4wIiwicGxhdGZvcm0iOiJ3ZWIiLCJtYW51ZmFjdHVyZXIiOiJCbGluayIsInByb2R1Y3QiOiJWMjIwNSIsImRlc2NyaXB0aW9uIjoiQW5kcm9pZCBCcm93c2VyIDQuMCAobGlrZSBDaHJvbWUgMTM2LjAuNzEwMy42MSkgb24gVjIyMDUgKEFuZHJvaWQgMTQpIiwidGltZXpvbmUiOiJBc2lhL01ha2Fzc2FyIn0=",
+                    'origin': "https://www.klikdokter.com",
+                    'referer': "https://www.klikdokter.com/",
+                    'accept-language': "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7"
+                },
+                "payload": json.dumps({"phone": phone})
+            },
+            "Alodokter": {
+                "url": "https://www.alodokter.com/resend-otp",
+                "headers": {
+                    'User-Agent': "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36",
+                    'Accept': "application/json",
+                    'Content-Type': "application/json",
+                    'Origin': "https://www.alodokter.com",
+                    'Referer': f"https://www.alodokter.com/otp_phone_number?type=register&phone={phone}",
+                    'Accept-Language': "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7"
+                },
+                "payload": json.dumps({
+                    "user": {
+                        "phone": phone,
+                        "uuid": str(uuid.uuid4())
+                    },
+                    "request_via": "sms"
+                })
+            }
         }
         
-        return jsonify(response)
+        if service not in OTP_SERVICES:
+            return jsonify({
+                'status': 'error',
+                'message': f'Layanan {service} tidak tersedia'
+            }), 400
+        
+        # Get service configuration
+        svc = OTP_SERVICES[service]
+        
+        try:
+            # Send OTP request
+            response = requests.post(
+                svc['url'],
+                data=svc['payload'],
+                headers=svc['headers'],
+                timeout=10
+            )
+            
+            # Parse response
+            try:
+                resp_json = response.json()
+            except Exception:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Response dari server OTP tidak valid',
+                    'service': service,
+                    'phone': phone
+                }), 502
+            
+            # Log successful request
+            logging.info(f"OTP sent successfully - Service: {service}, Phone: {phone}, Response: {resp_json}")
+            
+            return jsonify({
+                'status': 'success',
+                'message': f'OTP berhasil dikirim ke {phone} melalui {service}',
+                'service': service,
+                'phone': phone,
+                'response': resp_json,
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            })
+            
+        except requests.RequestException as e:
+            logging.error(f"Network error sending OTP: {e}")
+            return jsonify({
+                'status': 'error',
+                'message': f'Gagal menghubungi server {service}',
+                'error': str(e)
+            }), 502
         
     except Exception as e:
         logging.error(f"Error sending OTP: {e}")
         return jsonify({
             'status': 'error', 
-            'message': 'Terjadi kesalahan saat memproses permintaan OTP'
+            'message': 'Terjadi kesalahan saat memproses permintaan OTP',
+            'error': str(e)
         }), 500
 
 @app.errorhandler(404)
