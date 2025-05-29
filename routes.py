@@ -48,7 +48,7 @@ def otp_services():
             {"name": "KlikDokter", "prefix": "62", "status": "active"},
             {"name": "Alodokter", "prefix": "62", "status": "active"},
             {"name": "Shopee", "prefix": "62", "status": "maintenance"},
-            {"name": "Bukalapak", "prefix": "62", "status": "active"}
+            {"name": "Bukalapak", "prefix": "62", "status": "maintenance"}
         ]
         
         return render_template('otp_services.html', services=services)
