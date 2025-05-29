@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Delta Pro Monitoring{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-3">
+                <i class="fas fa-tachometer-alt text-primary me-2"></i>
+                System Dashboard
+            </h1>
+            <p class="text-muted">Real-time monitoring overview and system status</p>
+        </div>
+    </div>
+
+    <!-- System Status Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card status-card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted mb-2">CPU Usage</h6>
+                            <h4 class="mb-0" id="cpu-usage">
+                                {% if system_stats %}
+                                    {{ "%.1f"|format(system_stats.cpu_usage) }}%
+                                {% else %}
+                                    ---%
+                                {% endif %}
+                            </h4>
+                        </div>
+                        <div class="status-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="height: 4px;">
+                        <div class="progress-bar" id="cpu-progress" style="width: {{ system_stats.cpu_usage if system_stats else 0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card status-card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted mb-2">Memory Usage</h6>
+                            <h4 class="mb-0" id="memory-usage">
+                                {% if system_stats %}
+                                    {{ "%.1f"|format(system_stats.memory_usage) }}%
+                                {% else %}
+                                    ---%
+                                {% endif %}
+                            </h4>
+                        </div>
+                        <div class="status-icon bg-success bg-opacity-10 text-success">
+                            <i class="fas fa-memory"></i>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="height: 4px;">
+                        <div class="progress-bar bg-success" id="memory-progress" style="width: {{ system_stats.memory_usage if system_stats else 0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card status-card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted mb-2">Disk Usage</h6>
+                            <h4 class="mb-0" id="disk-usage">
+                                {% if system_stats %}
+                                    {{ "%.1f"|format(system_stats.disk_usage) }}%
+                                {% else %}
+                                    ---%
+                                {% endif %}
+                            </h4>
+                        </div>
+                        <div class="status-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="fas fa-hdd"></i>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="height: 4px;">
+                        <div class="progress-bar bg-warning" id="disk-progress" style="width: {{ system_stats.disk_usage if system_stats else 0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card status-card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted mb-2">System Uptime</h6>
+                            <h4 class="mb-0 small" id="uptime">
+                                {% if system_stats %}
+                                    {{ system_stats.uptime }}
+                                {% else %}
+                                    Unknown
+                                {% endif %}
+                            </h4>
+                        </div>
+                        <div class="status-icon bg-info bg-opacity-10 text-info">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts and Alerts Row -->
+    <div class="row">
+        <!-- Performance Chart -->
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line text-primary me-2"></i>
+                        Real-time Performance
+                    </h5>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <input type="radio" class="btn-check" name="timerange" id="range-1h" value="1h" checked>
+                        <label class="btn btn-outline-primary" for="range-1h">1H</label>
+                        
+                        <input type="radio" class="btn-check" name="timerange" id="range-6h" value="6h">
+                        <label class="btn btn-outline-primary" for="range-6h">6H</label>
+                        
+                        <input type="radio" class="btn-check" name="timerange" id="range-24h" value="24h">
+                        <label class="btn btn-outline-primary" for="range-24h">24H</label>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="performanceChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts Panel -->
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                        Active Alerts
+                        <span class="badge bg-danger ms-2" id="alert-count">
+                            {% if alerts %}{{ alerts|length }}{% else %}0{% endif %}
+                        </span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="alert-list" id="alert-list">
+                        {% if alerts %}
+                            {% for alert in alerts %}
+                            <div class="alert-item p-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1 text-{{ alert.severity }}">
+                                            <i class="fas fa-{{ alert.icon }} me-1"></i>
+                                            {{ alert.title }}
+                                        </h6>
+                                        <p class="mb-1 small text-muted">{{ alert.message }}</p>
+                                        <small class="text-muted">{{ alert.timestamp }}</small>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-secondary" 
+                                            onclick="acknowledgeAlert({{ alert.id }})">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
+                            <p class="text-muted mb-0">No active alerts</p>
+                            <small class="text-muted">All systems operating normally</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Services Status -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-server text-info me-2"></i>
+                        Service Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="services-status">
+                        <div class="col-md-3 mb-3">
+                            <div class="service-status d-flex align-items-center p-2 rounded">
+                                <div class="status-indicator bg-success me-3"></div>
+                                <div>
+                                    <h6 class="mb-0">Web Server</h6>
+                                    <small class="text-muted">Running</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="service-status d-flex align-items-center p-2 rounded">
+                                <div class="status-indicator bg-success me-3"></div>
+                                <div>
+                                    <h6 class="mb-0">Database</h6>
+                                    <small class="text-muted">Running</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="service-status d-flex align-items-center p-2 rounded">
+                                <div class="status-indicator bg-warning me-3"></div>
+                                <div>
+                                    <h6 class="mb-0">Cache Service</h6>
+                                    <small class="text-muted">Warning</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="service-status d-flex align-items-center p-2 rounded">
+                                <div class="status-indicator bg-success me-3"></div>
+                                <div>
+                                    <h6 class="mb-0">API Gateway</h6>
+                                    <small class="text-muted">Running</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

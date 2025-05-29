@@ -1,0 +1,302 @@
+/* Monitoring-specific styles */
+
+/* Alert Components */
+.alert-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.alert-item {
+    transition: background-color 0.2s ease;
+}
+
+.alert-item:hover {
+    background-color: hsl(var(--light) / 0.5);
+}
+
+.alert-item:last-child {
+    border-bottom: none !important;
+}
+
+/* Service Status */
+.service-status {
+    background-color: hsl(var(--light) / 0.3);
+    transition: all 0.2s ease;
+}
+
+.service-status:hover {
+    background-color: hsl(var(--light) / 0.6);
+}
+
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Chart Containers */
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+}
+
+/* Metric Icons */
+.metric-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: var(--border-radius);
+    margin: 0 auto;
+}
+
+/* Log Viewer */
+.log-container {
+    max-height: 600px;
+    overflow-y: auto;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875rem;
+}
+
+.log-entry {
+    padding: var(--spacing-sm) var(--spacing-md);
+    transition: background-color 0.2s ease;
+}
+
+.log-entry:hover {
+    background-color: hsl(var(--light) / 0.5);
+}
+
+.log-entry:last-child {
+    border-bottom: none !important;
+}
+
+.log-timestamp {
+    width: 120px;
+    font-size: 0.75rem;
+    color: hsl(var(--text-secondary));
+    margin-right: var(--spacing-md);
+    flex-shrink: 0;
+}
+
+.log-level {
+    width: 80px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    margin-right: var(--spacing-md);
+    flex-shrink: 0;
+    padding: 2px 6px;
+    border-radius: var(--border-radius-sm);
+}
+
+.log-level.level-debug {
+    background-color: hsl(var(--secondary) / 0.1);
+    color: hsl(var(--secondary));
+}
+
+.log-level.level-info {
+    background-color: hsl(var(--info) / 0.1);
+    color: hsl(var(--info));
+}
+
+.log-level.level-warning {
+    background-color: hsl(var(--warning) / 0.1);
+    color: hsl(45 100% 35%);
+}
+
+.log-level.level-error {
+    background-color: hsl(var(--danger) / 0.1);
+    color: hsl(var(--danger));
+}
+
+.log-level.level-critical {
+    background-color: hsl(var(--danger));
+    color: white;
+}
+
+.log-source {
+    width: 100px;
+    font-size: 0.75rem;
+    color: hsl(var(--text-secondary));
+    margin-right: var(--spacing-md);
+    flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.log-message {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+/* Status Colors */
+.status-online { color: hsl(var(--success)) !important; }
+.status-warning { color: hsl(var(--warning)) !important; }
+.status-error { color: hsl(var(--danger)) !important; }
+.status-offline { color: hsl(var(--secondary)) !important; }
+
+.bg-status-online { background-color: hsl(var(--success)) !important; }
+.bg-status-warning { background-color: hsl(var(--warning)) !important; }
+.bg-status-error { background-color: hsl(var(--danger)) !important; }
+.bg-status-offline { background-color: hsl(var(--secondary)) !important; }
+
+/* Loading States */
+.loading-skeleton {
+    background: linear-gradient(90deg, hsl(var(--light)) 25%, hsl(var(--border-color)) 50%, hsl(var(--light)) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid hsl(var(--border-color));
+    border-radius: 50%;
+    border-top-color: hsl(var(--primary));
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive Charts */
+@media (max-width: 768px) {
+    .chart-container {
+        height: 250px;
+    }
+    
+    .log-timestamp {
+        width: 80px;
+        font-size: 0.7rem;
+    }
+    
+    .log-level {
+        width: 60px;
+        font-size: 0.7rem;
+    }
+    
+    .log-source {
+        width: 80px;
+        font-size: 0.7rem;
+    }
+    
+    .log-message {
+        font-size: 0.8rem;
+    }
+}
+
+/* Custom Scrollbar for Log Container */
+.log-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.log-container::-webkit-scrollbar-track {
+    background: hsl(var(--light));
+}
+
+.log-container::-webkit-scrollbar-thumb {
+    background: hsl(var(--border-color));
+    border-radius: 3px;
+}
+
+.log-container::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--secondary));
+}
+
+/* Real-time Updates */
+.real-time-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: hsl(var(--success));
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+
+/* Card Hover Effects */
+.status-card:hover .status-icon {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
+
+/* Alert Acknowledgement */
+.alert-acknowledged {
+    opacity: 0.6;
+    background-color: hsl(var(--light) / 0.3);
+}
+
+.alert-acknowledged .alert-title {
+    text-decoration: line-through;
+}
+
+/* Performance Indicators */
+.performance-good { color: hsl(var(--success)) !important; }
+.performance-warning { color: hsl(var(--warning)) !important; }
+.performance-critical { color: hsl(var(--danger)) !important; }
+
+/* Trend Indicators */
+.trend-up::before {
+    content: "↗";
+    color: hsl(var(--success));
+    margin-right: 4px;
+}
+
+.trend-down::before {
+    content: "↘";
+    color: hsl(var(--danger));
+    margin-right: 4px;
+}
+
+.trend-stable::before {
+    content: "→";
+    color: hsl(var(--secondary));
+    margin-right: 4px;
+}
+
+/* Tooltip Enhancements */
+.tooltip-inner {
+    border-radius: var(--border-radius-sm);
+    font-size: 0.875rem;
+    max-width: 250px;
+}
+
+/* Footer Styles */
+.footer {
+    margin-top: auto;
+    border-top: 1px solid hsl(var(--border-color));
+}
+
+/* Auto-refresh Indicator */
+#auto-refresh-status {
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+#auto-refresh-status:hover {
+    text-decoration: underline;
+}

@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block title %}Metrics - Delta Pro Monitoring{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-3">
+                <i class="fas fa-chart-bar text-primary me-2"></i>
+                Performance Metrics
+            </h1>
+            <p class="text-muted">Detailed system performance analysis and trends</p>
+        </div>
+    </div>
+
+    <!-- Metrics Overview -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="metric-icon text-primary mb-3">
+                        <i class="fas fa-tachometer-alt fa-2x"></i>
+                    </div>
+                    <h5 class="card-title">Response Time</h5>
+                    <h3 class="text-primary">0ms</h3>
+                    <p class="text-muted mb-0">Average response time</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="metric-icon text-success mb-3">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                    <h5 class="card-title">Success Rate</h5>
+                    <h3 class="text-success">0%</h3>
+                    <p class="text-muted mb-0">Request success rate</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="metric-icon text-info mb-3">
+                        <i class="fas fa-exchange-alt fa-2x"></i>
+                    </div>
+                    <h5 class="card-title">Throughput</h5>
+                    <h3 class="text-info">0/s</h3>
+                    <p class="text-muted mb-0">Requests per second</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="metric-icon text-warning mb-3">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                    <h5 class="card-title">Error Rate</h5>
+                    <h3 class="text-warning">0%</h3>
+                    <p class="text-muted mb-0">Error percentage</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Charts -->
+    <div class="row">
+        <!-- CPU and Memory Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-microchip text-primary me-2"></i>
+                        CPU & Memory Usage
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="cpuMemoryChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Network Traffic Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-network-wired text-success me-2"></i>
+                        Network Traffic
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="networkChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disk I/O Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-hdd text-warning me-2"></i>
+                        Disk I/O
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="diskChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Response Time Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-stopwatch text-info me-2"></i>
+                        Response Times
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="responseChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metrics Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-table text-secondary me-2"></i>
+                        Detailed Metrics
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if error %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-exclamation-circle text-danger fa-2x mb-2"></i>
+                        <p class="text-muted mb-0">{{ error }}</p>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-chart-line text-muted fa-2x mb-2"></i>
+                        <p class="text-muted mb-0">No metrics data available</p>
+                        <small class="text-muted">Metrics will appear here when monitoring data is available</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize charts with empty data
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100
+            }
+        }
+    };
+
+    // CPU & Memory Chart
+    const cpuMemoryCtx = document.getElementById('cpuMemoryChart');
+    if (cpuMemoryCtx) {
+        new Chart(cpuMemoryCtx, {
+            type: 'line',
+            data: {
+                labels: ['No data'],
+                datasets: [{
+                    label: 'CPU %',
+                    data: [0],
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Memory %',
+                    data: [0],
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: chartOptions
+        });
+    }
+
+    // Network Traffic Chart
+    const networkCtx = document.getElementById('networkChart');
+    if (networkCtx) {
+        new Chart(networkCtx, {
+            type: 'area',
+            data: {
+                labels: ['No data'],
+                datasets: [{
+                    label: 'In (MB/s)',
+                    data: [0],
+                    borderColor: 'rgb(54, 162, 235)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    fill: true
+                }, {
+                    label: 'Out (MB/s)',
+                    data: [0],
+                    borderColor: 'rgb(255, 206, 86)',
+                    backgroundColor: 'rgba(255, 206, 86, 0.1)',
+                    fill: true
+                }]
+            },
+            options: chartOptions
+        });
+    }
+
+    // Disk I/O Chart
+    const diskCtx = document.getElementById('diskChart');
+    if (diskCtx) {
+        new Chart(diskCtx, {
+            type: 'bar',
+            data: {
+                labels: ['No data'],
+                datasets: [{
+                    label: 'Read (MB/s)',
+                    data: [0],
+                    backgroundColor: 'rgba(153, 102, 255, 0.8)'
+                }, {
+                    label: 'Write (MB/s)',
+                    data: [0],
+                    backgroundColor: 'rgba(255, 159, 64, 0.8)'
+                }]
+            },
+            options: chartOptions
+        });
+    }
+
+    // Response Time Chart
+    const responseCtx = document.getElementById('responseChart');
+    if (responseCtx) {
+        new Chart(responseCtx, {
+            type: 'line',
+            data: {
+                labels: ['No data'],
+                datasets: [{
+                    label: 'Response Time (ms)',
+                    data: [0],
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                ...chartOptions,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
