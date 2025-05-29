@@ -2,6 +2,8 @@ from flask import render_template, jsonify, request
 from app import app
 from monitor_service import MonitoringService
 import logging
+import time
+from datetime import datetime
 
 # Initialize monitoring service
 monitor = MonitoringService()
@@ -121,6 +123,44 @@ def acknowledge_alert(alert_id):
     except Exception as e:
         logging.error(f"API error - acknowledge alert: {e}")
         return jsonify({'error': 'Unable to acknowledge alert'}), 500
+
+@app.route('/api/send-otp', methods=['POST'])
+def send_otp():
+    """Send OTP to phone number"""
+    try:
+        data = request.get_json()
+        service = data.get('service')
+        phone = data.get('phone')
+        
+        if not service or not phone:
+            return jsonify({
+                'status': 'error',
+                'message': 'Service dan nomor telepon harus diisi'
+            }), 400
+        
+        # Log request
+        logging.info(f"OTP request - Service: {service}, Phone: {phone}")
+        
+        # Since this is a real OTP service, we need actual API credentials
+        # For now, return a proper response structure
+        response = {
+            'status': 'success',
+            'message': f'Permintaan OTP untuk {service} telah diterima',
+            'service': service,
+            'phone': phone,
+            'request_id': f"REQ_{int(time.time())}",
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'note': 'Untuk mengaktifkan pengiriman OTP yang sesungguhnya, diperlukan API key dari provider OTP'
+        }
+        
+        return jsonify(response)
+        
+    except Exception as e:
+        logging.error(f"Error sending OTP: {e}")
+        return jsonify({
+            'status': 'error', 
+            'message': 'Terjadi kesalahan saat memproses permintaan OTP'
+        }), 500
 
 @app.errorhandler(404)
 def not_found(error):

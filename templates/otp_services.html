@@ -129,6 +129,18 @@
                             <pre id="responseContent" class="mb-0"></pre>
                         </div>
                     </div>
+                    
+                    <!-- Information Alert -->
+                    <div class="alert alert-info mt-3">
+                        <h6><i class="fas fa-info-circle me-2"></i>Informasi Penting</h6>
+                        <p class="mb-2">Saat ini sistem dalam mode demo. Untuk mengaktifkan pengiriman OTP yang sesungguhnya, diperlukan:</p>
+                        <ul class="mb-0">
+                            <li>API key dari provider OTP (seperti SMS gateway)</li>
+                            <li>Konfigurasi endpoint dan kredensial yang valid</li>
+                            <li>Verifikasi akun dengan penyedia layanan</li>
+                        </ul>
+                        <small class="text-muted">Hubungi administrator untuk mengaktifkan layanan OTP sesungguhnya.</small>
+                    </div>
                 </div>
             </div>
         </div>
@@ -232,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function sendOtp() {
+    async function sendOtp() {
         const phoneNumber = document.getElementById('phoneNumber').value.trim();
         const loading = document.getElementById('otpLoading');
         const response = document.getElementById('otpResponse');
@@ -243,27 +255,59 @@ document.addEventListener('DOMContentLoaded', function() {
         loading.style.display = 'block';
         response.style.display = 'none';
         
-        // Simulate API call (in real implementation, this would call your OTP API)
-        setTimeout(() => {
+        try {
+            // Call real API endpoint
+            const apiResponse = await fetch('/api/send-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    service: selectedService,
+                    phone: selectedPrefix + phoneNumber
+                })
+            });
+            
+            const result = await apiResponse.json();
+            
+            // Hide loading
             loading.style.display = 'none';
             response.style.display = 'block';
             
-            // Mock response for demo
-            const mockResponse = {
-                status: 'success',
-                service: selectedService,
-                phone: selectedPrefix + phoneNumber,
-                message: 'OTP berhasil dikirim',
-                timestamp: new Date().toLocaleString()
+            if (result.status === 'success') {
+                responseAlert.className = 'alert alert-success';
+                responseContent.textContent = JSON.stringify(result, null, 2);
+                
+                if (monitoringSystem) {
+                    monitoringSystem.showNotification('Permintaan OTP berhasil dikirim!', 'success');
+                }
+            } else {
+                responseAlert.className = 'alert alert-danger';
+                responseContent.textContent = JSON.stringify(result, null, 2);
+                
+                if (monitoringSystem) {
+                    monitoringSystem.showNotification('Gagal mengirim OTP: ' + result.message, 'error');
+                }
+            }
+            
+        } catch (error) {
+            // Hide loading
+            loading.style.display = 'none';
+            response.style.display = 'block';
+            
+            const errorResponse = {
+                status: 'error',
+                message: 'Tidak dapat terhubung ke server',
+                error: error.message
             };
             
-            responseAlert.className = 'alert alert-success';
-            responseContent.textContent = JSON.stringify(mockResponse, null, 2);
+            responseAlert.className = 'alert alert-danger';
+            responseContent.textContent = JSON.stringify(errorResponse, null, 2);
             
             if (monitoringSystem) {
-                monitoringSystem.showNotification('OTP berhasil dikirim!', 'success');
+                monitoringSystem.showNotification('Error: Tidak dapat terhubung ke server', 'error');
             }
-        }, 2000);
+        }
     }
 });
 
