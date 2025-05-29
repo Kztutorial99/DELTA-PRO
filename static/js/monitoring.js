@@ -187,11 +187,62 @@ class MonitoringSystem {
 let monitoringSystem;
 document.addEventListener('DOMContentLoaded', function() {
     monitoringSystem = new MonitoringSystem();
+    
+    // Initialize profile menu functionality
+    initProfileMenu();
 });
+
+// Profile menu functionality
+function initProfileMenu() {
+    const profileBtn = document.getElementById('profileBtn');
+    const profileMenu = document.getElementById('profileMenu');
+    
+    if (profileBtn && profileMenu) {
+        // Toggle menu profil
+        profileBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            const active = profileMenu.classList.toggle('active');
+            profileMenu.setAttribute('aria-hidden', !active);
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', e => {
+            if (!profileMenu.contains(e.target) && e.target !== profileBtn) {
+                profileMenu.classList.remove('active');
+                profileMenu.setAttribute('aria-hidden', 'true');
+            }
+        });
+
+        // Ripple effect untuk link profil
+        profileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const oldRipple = this.querySelector('.ripple');
+                if (oldRipple) oldRipple.remove();
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                this.appendChild(ripple);
+                ripple.addEventListener('animationend', () => ripple.remove());
+            });
+        });
+    }
+}
 
 // Utility functions available globally
 function refreshPage() {
     window.location.reload();
+}
+
+function showSettings() {
+    if (monitoringSystem) {
+        monitoringSystem.showNotification('Settings panel akan segera tersedia', 'info');
+    }
 }
 
 function formatTimestamp(timestamp) {

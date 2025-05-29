@@ -26,7 +26,7 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('dashboard') }}">
                 <i class="fas fa-chart-line me-2"></i>
-                Delta Pro Monitor
+                DELTA PRO
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -44,13 +44,13 @@
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'metrics' %}active{% endif %}" 
                            href="{{ url_for('metrics') }}">
-                            <i class="fas fa-chart-bar me-1"></i>Metrics
+                            <i class="fas fa-chart-bar me-1"></i>Performance
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'logs' %}active{% endif %}" 
                            href="{{ url_for('logs') }}">
-                            <i class="fas fa-file-alt me-1"></i>Logs
+                            <i class="fas fa-file-alt me-1"></i>System Logs
                         </a>
                     </li>
                 </ul>
@@ -60,16 +60,51 @@
                         <i class="fas fa-circle text-success me-1"></i>
                         System Online
                     </span>
-                    <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-cog"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-                        </ul>
+                    <!-- Profile Button with DELTA PRO Style -->
+                    <button class="profile-btn" id="profileBtn" title="Info Pembuat" aria-label="Profil Pembuat">
+                        <svg width="100%" height="100%" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                            <circle cx="24" cy="24" r="24" fill="#222"/>
+                            <circle cx="24" cy="19" r="9" fill="#00ff99" fill-opacity="0.85"/>
+                            <ellipse cx="24" cy="36" rx="13" ry="7" fill="#00ff99" fill-opacity="0.25"/>
+                            <circle cx="24" cy="19" r="7" fill="#fff" fill-opacity="0.85"/>
+                            <ellipse cx="24" cy="36" rx="10" ry="5" fill="#fff" fill-opacity="0.25"/>
+                        </svg>
+                    </button>
+                    <div class="profile-menu" id="profileMenu" role="menu" aria-hidden="true">
+                        <h3>DELTA PRO</h3>
+                        <p>Panel by XanRoom</p>
+                        <div class="links">
+                            <a href="https://t.me/XanRoom" target="_blank" rel="noopener" role="menuitem">
+                                <span class="icon" aria-hidden="true">
+                                    <svg width="20" height="20" viewBox="0 0 50 50" fill="none">
+                                        <circle cx="25" cy="25" r="25" fill="#229ED9"/>
+                                        <path d="M37 15L13 24.5L21.5 27.5L34 18.5L23.5 28.5L23.5 35L27.5 30.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                                Telegram
+                            </a>
+                            <a href="https://youtube.com/@Kz.tutorial" target="_blank" rel="noopener" role="menuitem">
+                                <span class="icon" aria-hidden="true">
+                                    <svg width="20" height="20" viewBox="0 0 50 50" fill="none">
+                                        <circle cx="25" cy="25" r="25" fill="#FF0000"/>
+                                        <polygon points="20,17 36,25 20,33" fill="#fff"/>
+                                    </svg>
+                                </span>
+                                Youtube
+                            </a>
+                            <a href="#" role="menuitem" onclick="refreshPage()">
+                                <span class="icon" aria-hidden="true">
+                                    <i class="fas fa-sync-alt" style="color: #00ff99;"></i>
+                                </span>
+                                Refresh
+                            </a>
+                            <a href="#" role="menuitem" onclick="showSettings()">
+                                <span class="icon" aria-hidden="true">
+                                    <i class="fas fa-cog" style="color: #00ff99;"></i>
+                                </span>
+                                Settings
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

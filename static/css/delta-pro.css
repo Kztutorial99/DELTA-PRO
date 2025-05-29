@@ -270,6 +270,124 @@ body {
     border-color: hsl(var(--primary));
 }
 
+/* Profile Button and Menu from DELTA PRO */
+.profile-btn {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid #00ff99;
+    box-shadow: 0 0 10px #00ff99cc;
+    background: #222;
+    cursor: pointer;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin-left: 1rem;
+}
+
+.profile-btn:hover {
+    box-shadow: 0 0 15px #00ff99;
+}
+
+.profile-btn svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.profile-menu {
+    position: absolute;
+    top: 58px;
+    right: 0;
+    width: 240px;
+    background: rgba(20, 40, 30, 0.98);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px #00ff9944;
+    padding: 20px 16px 16px 16px;
+    z-index: 1050;
+    display: none;
+    animation: fadeIn 0.25s;
+}
+
+.profile-menu.active {
+    display: block;
+}
+
+.profile-menu h3 {
+    margin: 0 0 8px 0;
+    color: #00ff99;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-align: left;
+}
+
+.profile-menu p {
+    margin: 0 0 12px 0;
+    color: #bfffe0;
+    font-size: 1rem;
+    text-align: left;
+}
+
+.profile-menu .links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.profile-menu a {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #00ff99;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: color 0.2s;
+    border-radius: 7px;
+    padding: 5px 6px;
+    cursor: pointer;
+}
+
+.profile-menu a:hover {
+    color: #fff;
+    text-decoration: underline;
+    background: #00ff9922;
+}
+
+.profile-menu .icon {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+}
+
+.profile-menu a .ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple-anim 0.5s linear;
+    background: rgba(0,255,153,0.25);
+    pointer-events: none;
+    z-index: 2;
+}
+
+@keyframes ripple-anim {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
 /* Utilities */
 .text-primary { color: hsl(var(--primary)) !important; }
 .text-secondary { color: hsl(var(--secondary)) !important; }
