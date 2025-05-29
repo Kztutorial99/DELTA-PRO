@@ -45,7 +45,6 @@ def otp_services():
         # Define OTP services like in DELTA PRO
         services = [
             {"name": "Tokopedia", "prefix": "62", "status": "active"},
-            {"name": "LionParcel", "prefix": "+62", "status": "active"},
             {"name": "KlikDokter", "prefix": "62", "status": "active"},
             {"name": "Alodokter", "prefix": "62", "status": "active"},
             {"name": "Shopee", "prefix": "62", "status": "maintenance"},
@@ -175,23 +174,6 @@ def send_otp():
                     """
                 }])
             },
-            "LionParcel": {
-                "url": "https://algo-api.lionparcel.com/v2/account/auth/otp/request",
-                "headers": {
-                    'User-Agent': "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36",
-                    'Accept': "application/json, text/plain, */*",
-                    'Content-Type': "application/json",
-                    'origin': "https://lionparcel.com",
-                    'referer': "https://lionparcel.com/register",
-                    'accept-language': "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
-                },
-                "payload": json.dumps({
-                    "phone_number": phone,
-                    "role": "CUSTOMER",
-                    "otp_type": "REGISTER",
-                    "messaging_type": "WHATSAPP"
-                })
-            },
             "KlikDokter": {
                 "url": "https://user-api.medkomtek.com/user-svc/api/v1/users/check",
                 "headers": {
@@ -212,19 +194,18 @@ def send_otp():
                     'Accept': "application/json",
                     'Content-Type': "application/json",
                     'Origin': "https://www.alodokter.com",
-                    'Referer': f"https://www.alodokter.com/otp_phone_number?type=register&phone={phone}",
+                    'Referer': f"https://www.alodokter.com/otp_phone_number?type=register&phone=0{phone[2:]}",
                     'Accept-Language': "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7"
                 },
                 "payload": json.dumps({
                     "user": {
-                        "phone": phone,
+                        "phone": f"0{phone[2:]}",  # Convert 62xxx to 0xxx format
                         "uuid": str(uuid.uuid4())
                     },
                     "request_via": "sms"
                 })
             }
         }
-        
         if service not in OTP_SERVICES:
             return jsonify({
                 'status': 'error',
