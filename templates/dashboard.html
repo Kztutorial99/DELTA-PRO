@@ -311,6 +311,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 <script>
     // Smooth OTP Service Selection
     function selectOTPService(serviceName) {
@@ -365,8 +366,4 @@
         });
     });
 </script>
-{% endblock %}
-
-{% block extra_scripts %}
-<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}
